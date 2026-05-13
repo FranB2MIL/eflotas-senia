@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Constancia de Señal</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -345,7 +346,11 @@
 </div>
 
 <script>
-  const FORMSPREE = 'https://formspree.io/f/xaqvkkwp';
+  const EMAILJS_SERVICE  = 'service_531v8ul';
+  const EMAILJS_TEMPLATE = 'template_z44iuyf';
+  const EMAILJS_KEY      = 'fkYhQAfrSPBGvzINA';
+
+  emailjs.init(EMAILJS_KEY);
 
   function getParams() {
     const p = new URLSearchParams(window.location.search);
@@ -356,6 +361,7 @@
       venc:     p.get('venc')     || '',
       cliente:  p.get('cliente')  || '',
       obs:      p.get('obs')      || '',
+      email:    p.get('email')    || '',
     };
   }
 
@@ -416,30 +422,41 @@
     const tsLegible = ahora.toLocaleString('es-AR', { dateStyle: 'full', timeStyle: 'short' });
 
     const payload = {
-      legajo:      q.legajo,
-      vehiculo:    q.auto,
-      monto:       fmtMonto(q.monto),
-      vencimiento: fmtFecha(q.venc),
-      cliente:     q.cliente,
+      legajo:        q.legajo,
+      vehiculo:      q.auto,
+      monto:         fmtMonto(q.monto),
+      vencimiento:   fmtFecha(q.venc),
+      cliente:       q.cliente,
+      email_cliente: q.email,
       observaciones: q.obs || '(ninguna)',
-      aceptado_en: tsLegible,
-      _subject:    'Señal confirmada — Legajo ' + q.legajo + ' — ' + (q.cliente || 'Cliente'),
+      aceptado_en:   tsLegible,
+      _subject:      'Señal confirmada — Legajo ' + q.legajo + ' — ' + (q.cliente || 'Cliente'),
     };
 
     try {
-      const res = await fetch(FORMSPREE, {
+      const res = await fetch('https://formspree.io/f/xaqvkkwp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        btn.style.display = 'none';
-        document.getElementById('confirmed-state').style.display = 'block';
-        document.getElementById('confirmed-ts').textContent = 'Aceptado el ' + tsLegible;
-      } else {
-        throw new Error('Error ' + res.status);
+      if (!res.ok) throw new Error('Formspree error ' + res.status);
+
+      if (q.email) {
+        await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+          email_cliente: q.email,
+          cliente:       q.cliente || 'Cliente',
+          legajo:        q.legajo,
+          vehiculo:      q.auto,
+          monto:         fmtMonto(q.monto),
+          vencimiento:   fmtFecha(q.venc),
+          aceptado_en:   tsLegible,
+        });
       }
+
+      btn.style.display = 'none';
+      document.getElementById('confirmed-state').style.display = 'block';
+      document.getElementById('confirmed-ts').textContent = 'Aceptado el ' + tsLegible;
     } catch (e) {
       btn.disabled = false;
       btn.innerHTML = '<svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Acepto y confirmo la señal';
