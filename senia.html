@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constancia de Señal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2ED;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-muted: #7A7570;
+    --border: #E2DDD7;
+    --accent: #2D5016;
+    --accent-light: #EBF2E3;
+    --accent-border: #A8C98A;
+    --danger: #8B2020;
+    --danger-light: #F5EBEB;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: var(--text);
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .eyebrow::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--text-muted);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .card-ref {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .card-body {
+    padding: 1.5rem 2rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .field {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
+  }
+
+  .field:last-child { border-bottom: none; }
+
+  .field-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+
+  .field-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .field-value.monto {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--accent);
+  }
+
+  .terms {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    background: #FAFAF8;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 1.5rem;
+  }
+
+  .terms strong { color: var(--text); font-weight: 500; }
+
+  .btn-accept {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-accept:hover { opacity: 0.88; }
+  .btn-accept:active { transform: scale(0.99); }
+  .btn-accept:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .check-icon {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* Estado: confirmado */
+  .confirmed-state {
+    display: none;
+    text-align: center;
+    padding: 1.5rem 0 0.5rem;
+  }
+
+  .confirmed-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .confirmed-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .confirmed-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .confirmed-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .confirmed-timestamp {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px 12px;
+  }
+
+  /* Estado: error */
+  .error-msg {
+    display: none;
+    font-size: 12px;
+    color: var(--danger);
+    background: var(--danger-light);
+    border: 1px solid #E5BABA;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* Estado: link inválido */
+  .invalid-state {
+    text-align: center;
+    padding: 2rem;
+    display: none;
+  }
+
+  .invalid-state p { font-size: 14px; color: var(--text-muted); }
+
+  .card-footer {
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 520px) {
+    .card-header, .card-body { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .card-footer { padding-left: 1.25rem; padding-right: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <p class="eyebrow">E-Flotas &mdash; Constancia de reserva</p>
+
+  <div class="card" id="main-card">
+
+    <!-- Estado: datos cargados -->
+    <div id="normal-state">
+      <div class="card-header">
+        <h1 class="card-title">Confirmación<br>de señal</h1>
+        <p class="card-ref" id="ref-label">Cargando...</p>
+      </div>
+
+      <div class="card-body">
+        <div class="field-group">
+          <div class="field">
+            <span class="field-label">Legajo</span>
+            <span class="field-value" id="val-legajo">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Vehículo</span>
+            <span class="field-value" id="val-auto">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Monto de la señal</span>
+            <span class="field-value monto" id="val-monto">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Vencimiento</span>
+            <span class="field-value" id="val-venc">—</span>
+          </div>
+          <div class="field" id="row-cliente">
+            <span class="field-label">Cliente</span>
+            <span class="field-value" id="val-cliente">—</span>
+          </div>
+          <div class="field" id="row-obs" style="display:none">
+            <span class="field-label">Observaciones</span>
+            <span class="field-value" id="val-obs">—</span>
+          </div>
+        </div>
+
+        <p class="terms" id="val-terms"></p>
+
+        <button class="btn-accept" id="btn-accept" onclick="enviar()">
+          <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Acepto y confirmo la señal
+        </button>
+        <p class="error-msg" id="error-msg">Hubo un error al registrar la aceptación. Por favor, intentá de nuevo o contactanos.</p>
+
+        <!-- Estado: confirmado (dentro del card-body) -->
+        <div class="confirmed-state" id="confirmed-state">
+          <div class="confirmed-icon">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <p class="confirmed-title">Señal confirmada</p>
+          <p class="confirmed-sub">Tu aceptación quedó registrada.<br>Nos pondremos en contacto para coordinar el pago.</p>
+          <span class="confirmed-timestamp" id="confirmed-ts"></span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        Al confirmar, se registra la fecha, hora e IP de la aceptación.<br>
+        Este documento tiene validez como constancia de intención de compra.
+      </div>
+    </div>
+
+    <!-- Estado: link inválido -->
+    <div class="invalid-state" id="invalid-state">
+      <p style="font-size:14px; font-weight:500; color: var(--text); margin-bottom: 8px;">Link inválido o expirado</p>
+      <p>Este link no contiene los datos necesarios. Por favor, solicitá uno nuevo al equipo de ventas.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const FORMSPREE = 'https://formspree.io/f/xaqvkkwp';
+
+  function getParams() {
+    const p = new URLSearchParams(window.location.search);
+    return {
+      legajo:   p.get('legajo')   || '',
+      auto:     p.get('auto')     || '',
+      monto:    p.get('monto')    || '',
+      venc:     p.get('venc')     || '',
+      cliente:  p.get('cliente')  || '',
+      obs:      p.get('obs')      || '',
+    };
+  }
+
+  function fmtMonto(n) {
+    return '$' + Number(n).toLocaleString('es-AR');
+  }
+
+  function fmtFecha(s) {
+    if (!s) return '';
+    const [y, m, d] = s.split('-');
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return parseInt(d) + ' de ' + meses[parseInt(m) - 1] + ' de ' + y;
+  }
+
+  function init() {
+    const q = getParams();
+
+    if (!q.legajo || !q.monto || !q.venc) {
+      document.getElementById('normal-state').style.display = 'none';
+      document.getElementById('invalid-state').style.display = 'block';
+      return;
+    }
+
+    const legajoFull  = q.legajo + (q.auto ? ' — ' + q.auto : '');
+    const montoFmt    = fmtMonto(q.monto);
+    const vencFmt     = fmtFecha(q.venc);
+    const clienteNombre = q.cliente || 'el abajo firmante';
+
+    document.getElementById('ref-label').textContent = 'Ref. legajo ' + q.legajo;
+    document.getElementById('val-legajo').textContent  = q.legajo;
+    document.getElementById('val-auto').textContent    = q.auto || '—';
+    document.getElementById('val-monto').textContent   = montoFmt;
+    document.getElementById('val-venc').textContent    = vencFmt;
+    document.getElementById('val-cliente').textContent = q.cliente || '—';
+
+    if (q.obs) {
+      document.getElementById('row-obs').style.display = 'flex';
+      document.getElementById('val-obs').textContent = q.obs;
+    }
+
+    document.getElementById('val-terms').innerHTML =
+      'Al hacer clic en "Acepto y confirmo la señal", <strong>' + (q.cliente || 'el cliente') + '</strong> '
+      + 'se compromete a abonar <strong>' + montoFmt + '</strong> en concepto de señal '
+      + 'por el legajo <strong>' + legajoFull + '</strong>, '
+      + 'reservando el vehículo hasta el <strong>' + vencFmt + '</strong>. '
+      + 'La no efectivización del pago dentro del plazo implica la pérdida de la reserva.';
+  }
+
+  async function enviar() {
+    const btn = document.getElementById('btn-accept');
+    const errMsg = document.getElementById('error-msg');
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+    errMsg.style.display = 'none';
+
+    const q = getParams();
+    const ahora = new Date();
+    const tsLegible = ahora.toLocaleString('es-AR', { dateStyle: 'full', timeStyle: 'short' });
+
+    const payload = {
+      legajo:      q.legajo,
+      vehiculo:    q.auto,
+      monto:       fmtMonto(q.monto),
+      vencimiento: fmtFecha(q.venc),
+      cliente:     q.cliente,
+      observaciones: q.obs || '(ninguna)',
+      aceptado_en: tsLegible,
+      _subject:    'Señal confirmada — Legajo ' + q.legajo + ' — ' + (q.cliente || 'Cliente'),
+    };
+
+    try {
+      const res = await fetch(FORMSPREE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        btn.style.display = 'none';
+        document.getElementById('confirmed-state').style.display = 'block';
+        document.getElementById('confirmed-ts').textContent = 'Aceptado el ' + tsLegible;
+      } else {
+        throw new Error('Error ' + res.status);
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Acepto y confirmo la señal';
+      errMsg.style.display = 'block';
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
