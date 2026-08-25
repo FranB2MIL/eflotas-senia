@@ -279,7 +279,7 @@
     <!-- Estado: datos cargados -->
     <div id="normal-state">
       <div class="card-header">
-        <h1 class="card-title">Confirmación<br>de señal</h1>
+        <h1 class="card-title">Confirmación<br>de reserva</h1>
         <p class="card-ref" id="ref-label">Cargando...</p>
       </div>
 
@@ -294,7 +294,7 @@
             <span class="field-value" id="val-auto">—</span>
           </div>
           <div class="field">
-            <span class="field-label">Monto de la señal</span>
+            <span class="field-label">Monto de la seña</span>
             <span class="field-value monto" id="val-monto">—</span>
           </div>
           <div class="field">
@@ -315,7 +315,7 @@
 
         <button class="btn-accept" id="btn-accept" onclick="enviar()">
           <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Acepto y confirmo la señal
+          Acepto y confirmo la seña
         </button>
         <p class="error-msg" id="error-msg">Hubo un error al registrar la aceptación. Por favor, intentá de nuevo o contactanos.</p>
 
@@ -324,7 +324,7 @@
           <div class="confirmed-icon">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p class="confirmed-title">Señal confirmada</p>
+          <p class="confirmed-title">Seña confirmada</p>
           <p class="confirmed-sub">Tu aceptación quedó registrada.<br>Nos pondremos en contacto para coordinar el pago.</p>
           <span class="confirmed-timestamp" id="confirmed-ts"></span>
         </div>
@@ -403,8 +403,8 @@
     }
 
     document.getElementById('val-terms').innerHTML =
-      'Al hacer clic en "Acepto y confirmo la señal", <strong>' + (q.cliente || 'el cliente') + '</strong> '
-      + 'se compromete a abonar <strong>' + montoFmt + '</strong> en concepto de señal '
+      'Al hacer clic en "Acepto y confirmo la seña", <strong>' + (q.cliente || 'el cliente') + '</strong> '
+      + 'se compromete a abonar <strong>' + montoFmt + '</strong> en concepto de seña '
       + 'por el legajo <strong>' + legajoFull + '</strong>, '
       + 'reservando el vehículo hasta el <strong>' + vencFmt + '</strong>. '
       + 'La no efectivización del pago dentro del plazo implica la pérdida de la reserva.';
