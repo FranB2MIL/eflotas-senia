@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Constancia de Seña</title>
+<title>Constancia de Reserva</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
@@ -286,28 +286,44 @@
       <div class="card-body">
         <div class="field-group">
           <div class="field">
-            <span class="field-label">Legajo</span>
-            <span class="field-value" id="val-legajo">—</span>
+            <span class="field-label">Dominio</span>
+            <span class="field-value" id="val-dominio">—</span>
           </div>
           <div class="field">
             <span class="field-label">Vehículo</span>
             <span class="field-value" id="val-auto">—</span>
           </div>
           <div class="field">
-            <span class="field-label">Monto de la seña</span>
+            <span class="field-label">Año</span>
+            <span class="field-value" id="val-anio">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Color</span>
+            <span class="field-value" id="val-color">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Monto de la reserva</span>
             <span class="field-value monto" id="val-monto">—</span>
           </div>
           <div class="field">
-            <span class="field-label">Vencimiento</span>
+            <span class="field-label">Precio total de venta</span>
+            <span class="field-value monto" id="val-precio">—</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Vencimiento reserva</span>
             <span class="field-value" id="val-venc">—</span>
           </div>
-          <div class="field" id="row-cliente">
-            <span class="field-label">Cliente</span>
-            <span class="field-value" id="val-cliente">—</span>
+          <div class="field">
+            <span class="field-label">Oferente</span>
+            <span class="field-value" id="val-oferente"></span>
           </div>
-          <div class="field" id="row-obs" style="display:none">
-            <span class="field-label">Observaciones</span>
-            <span class="field-value" id="val-obs">—</span>
+          <div class="field">
+            <span class="field-label">Domicilio</span>
+            <span class="field-value" id="val-domicilio"></span>
+          </div>
+          <div class="field">
+            <span class="field-label">DNI</span>
+            <span class="field-value" id="val-dni"></span>
           </div>
         </div>
 
@@ -315,7 +331,7 @@
 
         <button class="btn-accept" id="btn-accept" onclick="enviar()">
           <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Acepto y confirmo la seña
+          Acepto y confirmo la reserva
         </button>
         <p class="error-msg" id="error-msg">Hubo un error al registrar la aceptación. Por favor, intentá de nuevo o contactanos.</p>
 
@@ -324,7 +340,7 @@
           <div class="confirmed-icon">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p class="confirmed-title">Seña confirmada</p>
+          <p class="confirmed-title">Reserva confirmada</p>
           <p class="confirmed-sub">Tu aceptación quedó registrada.<br>Nos pondremos en contacto para coordinar el pago.</p>
           <span class="confirmed-timestamp" id="confirmed-ts"></span>
         </div>
@@ -355,25 +371,26 @@
   function getParams() {
     const p = new URLSearchParams(window.location.search);
     return {
-      legajo:   p.get('legajo')   || '',
-      auto:     p.get('auto')     || '',
-      monto:    p.get('monto')    || '',
-      venc:     p.get('venc')     || '',
-      cliente:  p.get('cliente')  || '',
-      obs:      p.get('obs')      || '',
-      email:    p.get('email')    || '',
+      legajo:       p.get('legajo')       || '',
+      dominio:      p.get('dominio')      || '',
+      auto:         p.get('auto')         || '',
+      anio:         p.get('anio')         || '',
+      color:        p.get('color')        || '',
+      monto:        p.get('monto')        || '',
+      montoLetras:  p.get('montoLetras')  || '',
+      precio:       p.get('precio')       || '',
+      precioLetras: p.get('precioLetras') || '',
+      venc:         p.get('venc')         || '',
+      oferente:     p.get('oferente')     || '',
+      domicilio:    p.get('domicilio')    || '',
+      dni:          p.get('dni')          || '',
+      cliente:      p.get('cliente')      || '',
+      email:        p.get('email')        || '',
     };
   }
 
   function fmtMonto(n) {
     return '$' + Number(n).toLocaleString('es-AR');
-  }
-
-  function fmtFecha(s) {
-    if (!s) return '';
-    const [y, m, d] = s.split('-');
-    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    return parseInt(d) + ' de ' + meses[parseInt(m) - 1] + ' de ' + y;
   }
 
   function init() {
@@ -385,29 +402,28 @@
       return;
     }
 
-    const legajoFull  = q.legajo + (q.auto ? ' — ' + q.auto : '');
-    const montoFmt    = fmtMonto(q.monto);
-    const vencFmt     = fmtFecha(q.venc);
-    const clienteNombre = q.cliente || 'el abajo firmante';
+    const montoFmt  = fmtMonto(q.monto) + (q.montoLetras ? ' (' + q.montoLetras + ')' : '');
+    const precioFmt = q.precio ? (fmtMonto(q.precio) + (q.precioLetras ? ' (' + q.precioLetras + ')' : '')) : '—';
 
     document.getElementById('ref-label').textContent = 'Ref. legajo ' + q.legajo;
-    document.getElementById('val-legajo').textContent  = q.legajo;
-    document.getElementById('val-auto').textContent    = q.auto || '—';
-    document.getElementById('val-monto').textContent   = montoFmt;
-    document.getElementById('val-venc').textContent    = vencFmt;
-    document.getElementById('val-cliente').textContent = q.cliente || '—';
-
-    if (q.obs) {
-      document.getElementById('row-obs').style.display = 'flex';
-      document.getElementById('val-obs').textContent = q.obs;
-    }
+    document.getElementById('val-dominio').textContent   = q.dominio || '—';
+    document.getElementById('val-auto').textContent      = q.auto || '—';
+    document.getElementById('val-anio').textContent      = q.anio || '—';
+    document.getElementById('val-color').textContent     = q.color || '—';
+    document.getElementById('val-monto').textContent     = montoFmt;
+    document.getElementById('val-precio').textContent    = precioFmt;
+    document.getElementById('val-venc').textContent      = q.venc || '—';
+    document.getElementById('val-oferente').textContent  = q.oferente;
+    document.getElementById('val-domicilio').textContent = q.domicilio;
+    document.getElementById('val-dni').textContent       = q.dni;
 
     document.getElementById('val-terms').innerHTML =
-      'Al hacer clic en "Acepto y confirmo la seña", <strong>' + (q.cliente || 'el cliente') + '</strong> '
-      + 'se compromete a abonar <strong>' + montoFmt + '</strong> en concepto de seña '
-      + 'por el legajo <strong>' + legajoFull + '</strong>, '
-      + 'reservando el vehículo hasta el <strong>' + vencFmt + '</strong>. '
-      + 'La no efectivización del pago dentro del plazo implica la pérdida de la reserva.';
+      'Una vez aceptada la reserva, y verificado el depósito/transferencia en cuenta, quedará conformada '
+      + 'la reserva por el importe arriba descripto y a cuenta de precio total acordado.'
+      + '<br><br>'
+      + 'El saldo será abonado previo a la entrega de la unidad, en la misma cuenta descripta. La no '
+      + 'efectivización del pago dentro de los plazos acordados en la presente reserva, dará por desistida '
+      + 'la operación, sin derecho a reclamar devolución del importe pagado.';
   }
 
   async function enviar() {
@@ -423,14 +439,16 @@
 
     const payload = {
       legajo:        q.legajo,
+      dominio:       q.dominio,
       vehiculo:      q.auto,
       monto:         fmtMonto(q.monto),
-      vencimiento:   fmtFecha(q.venc),
+      precio:        q.precio ? fmtMonto(q.precio) : '',
+      vencimiento:   q.venc,
+      oferente:      q.oferente,
       cliente:       q.cliente,
       email_cliente: q.email,
-      observaciones: q.obs || '(ninguna)',
       aceptado_en:   tsLegible,
-      _subject:      'Señal confirmada — Legajo ' + q.legajo + ' — ' + (q.cliente || 'Cliente'),
+      _subject:      'Reserva confirmada — Legajo ' + q.legajo + ' — ' + (q.cliente || 'Cliente'),
     };
 
     try {
@@ -449,7 +467,7 @@
           legajo:        q.legajo,
           vehiculo:      q.auto,
           monto:         fmtMonto(q.monto),
-          vencimiento:   fmtFecha(q.venc),
+          vencimiento:   q.venc,
           aceptado_en:   tsLegible,
         });
       }
@@ -459,7 +477,7 @@
       document.getElementById('confirmed-ts').textContent = 'Aceptado el ' + tsLegible;
     } catch (e) {
       btn.disabled = false;
-      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Acepto y confirmo la señal';
+      btn.innerHTML = '<svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Acepto y confirmo la reserva';
       errMsg.style.display = 'block';
     }
   }
